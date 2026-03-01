@@ -284,6 +284,18 @@ set(INCLUDES
 #     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/sm100"
 # )
 
+# # =========================== Common Ops (single build) ============================= #
+# Python_add_library(common_ops MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${SOURCES})
+
+# target_compile_options(common_ops PRIVATE
+#     $<$<COMPILE_LANGUAGE:CUDA>:${SGL_KERNEL_CUDA_FLAGS}>
+# )
+# target_include_directories(common_ops PRIVATE ${INCLUDES})
+# target_link_libraries(common_ops PRIVATE ${TORCH_LIBRARIES} c10 cuda cublas cublasLt)
+
+# # IMPORTANT: put the module where sgl_kernel loader can find it
+# install(TARGETS common_ops LIBRARY DESTINATION "sgl_kernel")
+
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 execute_process(
     COMMAND ${Python3_EXECUTABLE} -c "import torch; print(int(torch._C._GLIBCXX_USE_CXX11_ABI))"
@@ -443,53 +455,59 @@ if (SGL_KERNEL_ENABLE_FLASHMLA)
   include(${CMAKE_CURRENT_LIST_DIR}/cmake/flashmla.cmake)
 endif()
 
-# ============================ Extra Install: DeepGEMM (JIT) ============================= #
-# Create a separate library for DeepGEMM's Python API.
-# This keeps its compilation isolated from the main common_ops.
-set(DEEPGEMM_SOURCES
+option(SGL_KERNEL_ENABLE_DEEPGEMM "Build DeepGEMM JIT extension (not needed for T4)" OFF)
+
+if (SGL_KERNEL_ENABLE_DEEPGEMM)
+
+    # ============================ Extra Install: DeepGEMM (JIT) ============================= #
+    # Create a separate library for DeepGEMM's Python API.
+    # This keeps its compilation isolated from the main common_ops.
+    set(DEEPGEMM_SOURCES
     "${repo-deepgemm_SOURCE_DIR}/csrc/python_api.cpp"
-)
+    )
 
-Python_add_library(deep_gemm_cpp MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${DEEPGEMM_SOURCES})
+    Python_add_library(deep_gemm_cpp MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${DEEPGEMM_SOURCES})
 
-# Link against necessary libraries, including nvrtc for JIT compilation.
-target_link_libraries(deep_gemm_cpp PRIVATE ${TORCH_LIBRARIES} c10 cuda nvrtc mscclpp_static)
+    # Link against necessary libraries, including nvrtc for JIT compilation.
+    # target_link_libraries(deep_gemm_cpp PRIVATE ${TORCH_LIBRARIES} c10 cuda nvrtc mscclpp_static)
+    target_link_libraries(deep_gemm_cpp PRIVATE ${TORCH_LIBRARIES} c10 cuda nvrtc)
 
-# Add include directories needed by DeepGEMM.
-target_include_directories(deep_gemm_cpp PRIVATE
+    # Add include directories needed by DeepGEMM.
+    target_include_directories(deep_gemm_cpp PRIVATE
     ${repo-deepgemm_SOURCE_DIR}/deep_gemm/include
     ${repo-cutlass_SOURCE_DIR}/include
     ${repo-fmt_SOURCE_DIR}/include
-)
+    )
 
-# Apply the same compile options as common_ops.
-target_compile_options(deep_gemm_cpp PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${SGL_KERNEL_CUDA_FLAGS}>)
+    # Apply the same compile options as common_ops.
+    target_compile_options(deep_gemm_cpp PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${SGL_KERNEL_CUDA_FLAGS}>)
 
-# Create an empty __init__.py to make `deepgemm` a Python package.
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/deepgemm_pkg_init.py "")
-install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/deepgemm_pkg_init.py
-    DESTINATION deep_gemm
-    RENAME __init__.py
-)
-
-# Install the compiled DeepGEMM API library.
-install(TARGETS deep_gemm_cpp LIBRARY DESTINATION deep_gemm)
-
-# Install the source files required by DeepGEMM for runtime JIT compilation.
-install(
-    DIRECTORY ${repo-deepgemm_SOURCE_DIR}/deep_gemm/
-    DESTINATION deep_gemm
-)
-
-install(DIRECTORY "${repo-cutlass_SOURCE_DIR}/include/cute/"
-        DESTINATION "deep_gemm/include/cute")
-
-install(DIRECTORY "${repo-cutlass_SOURCE_DIR}/include/cutlass/"
-        DESTINATION "deep_gemm/include/cutlass")
-
-# ============================ Extra Install: triton kernels ============================= #
-install(DIRECTORY "${repo-triton_SOURCE_DIR}/python/triton_kernels/triton_kernels/"
+    # Create an empty __init__.py to make `deepgemm` a Python package.
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/deepgemm_pkg_init.py "")
+    install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/deepgemm_pkg_init.py
+        DESTINATION deep_gemm
+        RENAME __init__.py
+        )
+        
+        # Install the compiled DeepGEMM API library.
+        install(TARGETS deep_gemm_cpp LIBRARY DESTINATION deep_gemm)
+        
+        # Install the source files required by DeepGEMM for runtime JIT compilation.
+        install(
+            DIRECTORY ${repo-deepgemm_SOURCE_DIR}/deep_gemm/
+            DESTINATION deep_gemm
+            )
+            
+            install(DIRECTORY "${repo-cutlass_SOURCE_DIR}/include/cute/"
+            DESTINATION "deep_gemm/include/cute")
+            
+            install(DIRECTORY "${repo-cutlass_SOURCE_DIR}/include/cutlass/"
+            DESTINATION "deep_gemm/include/cutlass")
+        
+endif()
+        # ============================ Extra Install: triton kernels ============================= #
+        install(DIRECTORY "${repo-triton_SOURCE_DIR}/python/triton_kernels/triton_kernels/"
         DESTINATION "triton_kernels"
         PATTERN ".git*" EXCLUDE
         PATTERN "__pycache__" EXCLUDE)
