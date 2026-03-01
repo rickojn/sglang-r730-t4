@@ -201,9 +201,9 @@ set(SOURCES
     "csrc/gemm/per_token_quant_fp8.cu"
     "csrc/gemm/qserve_w4a8_per_chn_gemm.cu"
     "csrc/gemm/qserve_w4a8_per_group_gemm.cu"
-    "csrc/gemm/marlin/gptq_marlin.cu"
-    "csrc/gemm/marlin/gptq_marlin_repack.cu"
-    "csrc/gemm/marlin/awq_marlin_repack.cu"
+#     "csrc/gemm/marlin/gptq_marlin.cu"  # missing on this checkout
+#     "csrc/gemm/marlin/gptq_marlin_repack.cu"  # missing on this checkout
+#     "csrc/gemm/marlin/awq_marlin_repack.cu"  # missing on this checkout
     "csrc/gemm/gptq/gptq_kernel.cu"
     "csrc/grammar/apply_token_bitmask_inplace_cuda.cu"
 
@@ -215,7 +215,7 @@ set(SOURCES
     "csrc/moe/cutlass_moe/w4a8/scaled_mm_entry.cu"
     "csrc/moe/cutlass_moe/w4a8/w4a8_moe_data.cu"
     "csrc/moe/cutlass_moe/w4a8/w4a8_grouped_mm_c3x.cu"
-    "csrc/moe/marlin_moe_wna16/ops.cu"
+#     "csrc/moe/marlin_moe_wna16/ops.cu"  # missing on this checkout
     "csrc/moe/moe_align_kernel.cu"
     "csrc/moe/moe_fused_gate.cu"
     "csrc/moe/fused_qknorm_rope_kernel.cu"
@@ -284,17 +284,17 @@ set(INCLUDES
 #     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/sm100"
 # )
 
-# # =========================== Common Ops (single build) ============================= #
-# Python_add_library(common_ops MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${SOURCES})
+# =========================== Common Ops (single build) ============================= #
+Python_add_library(common_ops MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${SOURCES})
 
-# target_compile_options(common_ops PRIVATE
-#     $<$<COMPILE_LANGUAGE:CUDA>:${SGL_KERNEL_CUDA_FLAGS}>
-# )
-# target_include_directories(common_ops PRIVATE ${INCLUDES})
-# target_link_libraries(common_ops PRIVATE ${TORCH_LIBRARIES} c10 cuda cublas cublasLt)
+target_compile_options(common_ops PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:${SGL_KERNEL_CUDA_FLAGS}>
+)
+target_include_directories(common_ops PRIVATE ${INCLUDES})
+target_link_libraries(common_ops PRIVATE ${TORCH_LIBRARIES} c10 cuda cublas cublasLt)
 
-# # IMPORTANT: put the module where sgl_kernel loader can find it
-# install(TARGETS common_ops LIBRARY DESTINATION "sgl_kernel")
+# IMPORTANT: put the module where sgl_kernel loader can find it
+install(TARGETS common_ops LIBRARY DESTINATION "sgl_kernel")
 
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 execute_process(
