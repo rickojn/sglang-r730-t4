@@ -177,28 +177,28 @@ set(SOURCES
     "csrc/elementwise/rope.cu"
     "csrc/elementwise/pos_enc.cu"
     "csrc/elementwise/topk.cu"
-    "csrc/expert_specialization/es_fp8_blockwise.cu"
+#     "csrc/expert_specialization/es_fp8_blockwise.cu"  # disable FP8 for sm75
     # "csrc/expert_specialization/es_sm100_mxfp8_blockscaled.cu"
     # "csrc/expert_specialization/es_sm100_mxfp8_blockscaled_group_quant.cu"
 
-    "csrc/gemm/awq_kernel.cu"
-    "csrc/gemm/bmm_fp8.cu"
+#     "csrc/gemm/awq_kernel.cu"  # disable AWQ kernel for sm75 build
+#     "csrc/gemm/bmm_fp8.cu"  # disable FP8 for sm75
     "csrc/gemm/dsv3_fused_a_gemm.cu"
     "csrc/gemm/dsv3_router_gemm_bf16_out.cu"
     "csrc/gemm/dsv3_router_gemm_entry.cu"
     "csrc/gemm/dsv3_router_gemm_float_out.cu"
-    "csrc/gemm/fp8_blockwise_gemm_kernel.cu"
-    "csrc/gemm/fp8_gemm_kernel.cu"
+#     "csrc/gemm/fp8_blockwise_gemm_kernel.cu"  # disable FP8 for sm75
+#     "csrc/gemm/fp8_gemm_kernel.cu"  # disable FP8 for sm75
     "csrc/gemm/int8_gemm_kernel.cu"
-    "csrc/gemm/nvfp4_expert_quant.cu"
-    "csrc/gemm/nvfp4_quant_entry.cu"
-    "csrc/gemm/nvfp4_quant_kernels.cu"
-    "csrc/gemm/nvfp4_scaled_mm_entry.cu"
-    "csrc/gemm/nvfp4_scaled_mm_kernels.cu"
-    "csrc/gemm/per_tensor_quant_fp8.cu"
+#     "csrc/gemm/nvfp4_expert_quant.cu"  # disable FP4 for sm75
+#     "csrc/gemm/nvfp4_quant_entry.cu"  # disable FP4 for sm75
+#     "csrc/gemm/nvfp4_quant_kernels.cu"  # disable FP4 for sm75
+#     "csrc/gemm/nvfp4_scaled_mm_entry.cu"  # disable FP4 for sm75
+#     "csrc/gemm/nvfp4_scaled_mm_kernels.cu"  # disable FP4 for sm75
+#     "csrc/gemm/per_tensor_quant_fp8.cu"  # disable FP8 for sm75
     "csrc/gemm/per_token_group_quant_8bit.cu"
     "csrc/gemm/per_token_group_quant_8bit_v2.cu"
-    "csrc/gemm/per_token_quant_fp8.cu"
+#     "csrc/gemm/per_token_quant_fp8.cu"  # disable FP8 for sm75
     "csrc/gemm/qserve_w4a8_per_chn_gemm.cu"
     "csrc/gemm/qserve_w4a8_per_group_gemm.cu"
 #     "csrc/gemm/marlin/gptq_marlin.cu"  # missing on this checkout
@@ -214,18 +214,18 @@ set(SOURCES
 
     "csrc/moe/cutlass_moe/w4a8/scaled_mm_entry.cu"
     "csrc/moe/cutlass_moe/w4a8/w4a8_moe_data.cu"
-    "csrc/moe/cutlass_moe/w4a8/w4a8_grouped_mm_c3x.cu"
+#     "csrc/moe/cutlass_moe/w4a8/w4a8_grouped_mm_c3x.cu"  # SM90/Hopper path; disable for sm75
 #     "csrc/moe/marlin_moe_wna16/ops.cu"  # missing on this checkout
     "csrc/moe/moe_align_kernel.cu"
     "csrc/moe/moe_fused_gate.cu"
-    "csrc/moe/fused_qknorm_rope_kernel.cu"
+#     "csrc/moe/fused_qknorm_rope_kernel.cu"  # BF16-only / not for sm75
     "csrc/moe/kimi_k2_moe_fused_gate.cu"
     "csrc/moe/moe_sum.cu"
     "csrc/moe/moe_sum_reduce.cu"
     "csrc/moe/moe_topk_softmax_kernels.cu"
     "csrc/moe/moe_topk_sigmoid_kernels.cu"
-    "csrc/moe/nvfp4_blockwise_moe.cu"
-    "csrc/moe/fp8_blockwise_moe_kernel.cu"
+#     "csrc/moe/nvfp4_blockwise_moe.cu"  # disable FP4 for sm75
+#     "csrc/moe/fp8_blockwise_moe_kernel.cu"  # disable FP8 for sm75
     "csrc/moe/prepare_moe_input.cu"
 
     "csrc/quantization/gguf/gguf_kernel.cu"
