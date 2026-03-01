@@ -165,7 +165,7 @@ list(APPEND SGL_KERNEL_CUDA_FLAGS "--threads=${SGL_KERNEL_COMPILE_THREADS}")
 # NOTE: Please sort the filenames alphabetically
 set(SOURCES
     "csrc/attention/cascade.cu"
-    "csrc/attention/cutlass_mla_kernel.cu"
+#     "csrc/attention/cutlass_mla_kernel.cu"  # disable MLA (sm70/sm75)
     "csrc/attention/merge_attn_states.cu"
     "csrc/attention/vertical_slash_index.cu"
     "csrc/common_extension.cc"

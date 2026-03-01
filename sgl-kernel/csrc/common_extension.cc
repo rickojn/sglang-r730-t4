@@ -54,11 +54,11 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
   m.impl("merge_state", torch::kCUDA, &merge_state);
   m.def("merge_state_v2(Tensor v_a, Tensor s_a, Tensor v_b, Tensor s_b, Tensor! v_merged, Tensor! s_merged) -> ()");
   m.impl("merge_state_v2", torch::kCUDA, &merge_state_v2);
-  m.def(
-      "cutlass_mla_decode(Tensor! out, Tensor q_nope, Tensor q_pe, Tensor kv_c_and_k_pe_cache, Tensor seq_lens, Tensor "
-      "page_table, Tensor! workspace, float sm_scale, int num_kv_splits) -> ()");
-  m.impl("cutlass_mla_decode", torch::kCUDA, &cutlass_mla_decode);
-  m.def("cutlass_mla_get_workspace_size", &cutlass_mla_get_workspace_size);
+//   m.def(
+//       "cutlass_mla_decode(Tensor! out, Tensor q_nope, Tensor q_pe, Tensor kv_c_and_k_pe_cache, Tensor seq_lens, Tensor "
+//       "page_table, Tensor! workspace, float sm_scale, int num_kv_splits) -> ()");
+//   m.impl("cutlass_mla_decode", torch::kCUDA, &cutlass_mla_decode);
+//   m.def("cutlass_mla_get_workspace_size", &cutlass_mla_get_workspace_size);
 
   /*
    * From csrc/elementwise
@@ -218,10 +218,10 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
       "moe_softcapping, Tensor? correction_bias) -> ()");
   m.impl("topk_softmax", torch::kCUDA, &topk_softmax);
 
-  m.def(
-      "topk_sigmoid(Tensor! topk_weights, Tensor! topk_indices, Tensor gating_output, bool renormalize, Tensor? "
-      "correction_bias) -> ()");
-  m.impl("topk_sigmoid", torch::kCUDA, &topk_sigmoid);
+//   m.def(
+//       "topk_sigmoid(Tensor! topk_weights, Tensor! topk_indices, Tensor gating_output, bool renormalize, Tensor? "
+//       "correction_bias) -> ()");
+//   m.impl("topk_sigmoid", torch::kCUDA, &topk_sigmoid);
 
   m.def("moe_sum_reduce(Tensor input, Tensor output, float routed_scaling_factor) -> ()");
   m.impl("moe_sum_reduce", torch::kCUDA, &moe_sum_reduce);
@@ -229,11 +229,11 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
   m.def("moe_sum(Tensor input, Tensor! output) -> ()");
   m.impl("moe_sum", torch::kCUDA, &moe_sum);
 
-  m.def(
-      "moe_fused_gate(Tensor input, Tensor bias, int num_expert_group, int topk_group, int topk, int "
-      "num_fused_shared_experts, float routed_scaling_factor, bool apply_routed_scaling_factor_on_output) -> "
-      "(Tensor[])");
-  m.impl("moe_fused_gate", torch::kCUDA, &moe_fused_gate);
+//   m.def(
+//       "moe_fused_gate(Tensor input, Tensor bias, int num_expert_group, int topk_group, int topk, int "
+//       "num_fused_shared_experts, float routed_scaling_factor, bool apply_routed_scaling_factor_on_output) -> "
+//       "(Tensor[])");
+//   m.impl("moe_fused_gate", torch::kCUDA, &moe_fused_gate);
 
   m.def(
       "kimi_k2_moe_fused_gate(Tensor input, Tensor bias, int topk, bool renormalize, "
