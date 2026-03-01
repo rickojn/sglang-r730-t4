@@ -212,21 +212,21 @@ set(SOURCES
     "csrc/memory/store.cu"
     "csrc/memory/weak_ref_tensor.cpp"
 
-    "csrc/moe/cutlass_moe/w4a8/scaled_mm_entry.cu"
-    "csrc/moe/cutlass_moe/w4a8/w4a8_moe_data.cu"
+#     "csrc/moe/cutlass_moe/w4a8/scaled_mm_entry.cu"  # disable MoE for sm75 build
+#     "csrc/moe/cutlass_moe/w4a8/w4a8_moe_data.cu"  # disable MoE for sm75 build
 #     "csrc/moe/cutlass_moe/w4a8/w4a8_grouped_mm_c3x.cu"  # SM90/Hopper path; disable for sm75
 #     "csrc/moe/marlin_moe_wna16/ops.cu"  # missing on this checkout
-    "csrc/moe/moe_align_kernel.cu"
-    "csrc/moe/moe_fused_gate.cu"
+#     "csrc/moe/moe_align_kernel.cu"  # disable MoE for sm75 build
+#     "csrc/moe/moe_fused_gate.cu"  # disable MoE for sm75 build
 #     "csrc/moe/fused_qknorm_rope_kernel.cu"  # BF16-only / not for sm75
-    "csrc/moe/kimi_k2_moe_fused_gate.cu"
-    "csrc/moe/moe_sum.cu"
-    "csrc/moe/moe_sum_reduce.cu"
-    "csrc/moe/moe_topk_softmax_kernels.cu"
-    "csrc/moe/moe_topk_sigmoid_kernels.cu"
+#     "csrc/moe/kimi_k2_moe_fused_gate.cu"  # disable MoE for sm75 build
+#     "csrc/moe/moe_sum.cu"  # disable MoE for sm75 build
+#     "csrc/moe/moe_sum_reduce.cu"  # disable MoE for sm75 build
+#     "csrc/moe/moe_topk_softmax_kernels.cu"  # disable MoE for sm75 build
+#     "csrc/moe/moe_topk_sigmoid_kernels.cu"  # disable MoE for sm75 build
 #     "csrc/moe/nvfp4_blockwise_moe.cu"  # disable FP4 for sm75
 #     "csrc/moe/fp8_blockwise_moe_kernel.cu"  # disable FP8 for sm75
-    "csrc/moe/prepare_moe_input.cu"
+#     "csrc/moe/prepare_moe_input.cu"  # disable MoE for sm75 build
 
     "csrc/quantization/gguf/gguf_kernel.cu"
     "csrc/speculative/eagle_utils.cu"
