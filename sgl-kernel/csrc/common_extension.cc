@@ -39,10 +39,10 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
   m.impl("all_reduce", torch::kCUDA, &all_reduce);
 
   m.def("mscclpp_generate_unique_id", &mscclpp_generate_unique_id);
-  m.def(
-      "mscclpp_init_context(Tensor unique_id, int rank, int world_size, Tensor scratch, Tensor put_buffer, "
-      "int nranks_per_node, int[] rank_to_node, int[] rank_to_ib, int context_selection) -> int");
-  m.impl("mscclpp_init_context", torch::kCUDA, &mscclpp_init_context);
+//   m.def(
+//       "mscclpp_init_context(Tensor unique_id, int rank, int world_size, Tensor scratch, Tensor put_buffer, "
+//       "int nranks_per_node, int[] rank_to_node, int[] rank_to_ib, int context_selection) -> int");
+//   m.impl("mscclpp_init_context", torch::kCUDA, &mscclpp_init_context);
 
   m.def("mscclpp_allreduce(int context, Tensor inp, Tensor! out, int nthreads, int nblocks) -> ()");
   m.impl("mscclpp_allreduce", torch::kCUDA, &mscclpp_allreduce);
@@ -136,10 +136,10 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
 //       "bias) -> Tensor");
 //   m.impl("fp8_scaled_mm", torch::kCUDA, &fp8_scaled_mm);
 
-  m.def(
-      "fp8_blockwise_scaled_mm(Tensor mat_a, Tensor mat_b, Tensor scales_a, Tensor scales_b, ScalarType out_dtype) -> "
-      "Tensor");
-  m.impl("fp8_blockwise_scaled_mm", torch::kCUDA, &fp8_blockwise_scaled_mm);
+//   m.def(
+//       "fp8_blockwise_scaled_mm(Tensor mat_a, Tensor mat_b, Tensor scales_a, Tensor scales_b, ScalarType out_dtype) -> "
+//       "Tensor");
+//   m.impl("fp8_blockwise_scaled_mm", torch::kCUDA, &fp8_blockwise_scaled_mm);
 
   m.def(
       "sgl_per_token_group_quant_8bit(Tensor input, Tensor! output_q, Tensor! output_s, int group_size,"
@@ -183,12 +183,12 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
       "Tensor input, Tensor input_global_scale, Tensor mask, bool use_silu_and_mul) -> ()");
   m.impl("silu_and_mul_scaled_fp4_experts_quant", torch::kCUDA, &silu_and_mul_scaled_fp4_experts_quant);
 
-  m.def(
-      "cutlass_fp4_group_mm(Tensor! output, Tensor a, Tensor b,"
-      "Tensor a_blockscale, Tensor b_blockscale, Tensor alphas,"
-      "Tensor ab_strides, Tensor c_strides, Tensor problem_sizes,"
-      " Tensor expert_offsets, Tensor sf_offsets) -> ()");
-  m.impl("cutlass_fp4_group_mm", torch::kCUDA, &cutlass_fp4_group_mm);
+//   m.def(
+//       "cutlass_fp4_group_mm(Tensor! output, Tensor a, Tensor b,"
+//       "Tensor a_blockscale, Tensor b_blockscale, Tensor alphas,"
+//       "Tensor ab_strides, Tensor c_strides, Tensor problem_sizes,"
+//       " Tensor expert_offsets, Tensor sf_offsets) -> ()");
+//   m.impl("cutlass_fp4_group_mm", torch::kCUDA, &cutlass_fp4_group_mm);
 
   m.def("dsv3_router_gemm(Tensor! output, Tensor mat_a, Tensor mat_b) -> ()");
   m.impl("dsv3_router_gemm", torch::kCUDA, &dsv3_router_gemm);
@@ -223,8 +223,8 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
 //       "correction_bias) -> ()");
 //   m.impl("topk_sigmoid", torch::kCUDA, &topk_sigmoid);
 
-  m.def("moe_sum_reduce(Tensor input, Tensor output, float routed_scaling_factor) -> ()");
-  m.impl("moe_sum_reduce", torch::kCUDA, &moe_sum_reduce);
+//   m.def("moe_sum_reduce(Tensor input, Tensor output, float routed_scaling_factor) -> ()");
+//   m.impl("moe_sum_reduce", torch::kCUDA, &moe_sum_reduce);
 
   m.def("moe_sum(Tensor input, Tensor! output) -> ()");
   m.impl("moe_sum", torch::kCUDA, &moe_sum);
