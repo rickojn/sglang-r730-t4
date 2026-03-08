@@ -117,11 +117,13 @@ endif()
 
 # Configure gencode below SM90
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-    set(DEFAULT_ENABLE_BELOW_SM90 OFF)
-    message(STATUS "For aarch64, disable gencode below SM90 by default")
+set(DEFAULT_ENABLE_BELOW_SM90 OFF)
+message(STATUS "For aarch64, disable gencode below SM90 by default")
 else()
-    set(DEFAULT_ENABLE_BELOW_SM90 ON)
+set(DEFAULT_ENABLE_BELOW_SM90 ON)
 endif()
+# rickojn no sm90
+set(DEFAULT_ENABLE_BELOW_SM90 ON)
 
 option(ENABLE_BELOW_SM90 "Enable gencode below SM90" ${DEFAULT_ENABLE_BELOW_SM90})
 
@@ -205,6 +207,8 @@ endif()
 
 if (ENABLE_BELOW_SM90)
     list(APPEND SGL_KERNEL_CUDA_FLAGS
+        "-gencode=arch=compute_70,code=sm_70"
+        "-gencode=arch=compute_75,code=sm_75"
         "-gencode=arch=compute_80,code=sm_80"
         "-gencode=arch=compute_89,code=sm_89"
     )
@@ -347,19 +351,20 @@ set(INCLUDES
     ${repo-flash-attention_SOURCE_DIR}/csrc/flash_attn/src
 )
 
+# rickojn no sm90
 # =========================== Common SM90 Build ============================= #
 # Build SM90 library with fast math optimization (same namespace, different directory)
-Python_add_library(common_ops_sm90_build MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${SOURCES})
+# Python_add_library(common_ops_sm90_build MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${SOURCES})
 
-target_compile_options(common_ops_sm90_build PRIVATE
-    $<$<COMPILE_LANGUAGE:CUDA>:${SGL_KERNEL_CUDA_FLAGS} -use_fast_math>
-)
-target_include_directories(common_ops_sm90_build PRIVATE ${INCLUDES})
-# Set output name and separate build directory to avoid conflicts
-set_target_properties(common_ops_sm90_build PROPERTIES
-    OUTPUT_NAME "common_ops"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/sm90"
-)
+# target_compile_options(common_ops_sm90_build PRIVATE
+#     $<$<COMPILE_LANGUAGE:CUDA>:${SGL_KERNEL_CUDA_FLAGS} -use_fast_math>
+# )
+# target_include_directories(common_ops_sm90_build PRIVATE ${INCLUDES})
+# # Set output name and separate build directory to avoid conflicts
+# set_target_properties(common_ops_sm90_build PROPERTIES
+#     OUTPUT_NAME "common_ops"
+#     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/sm90"
+# )
 
 # =========================== Common SM100+ Build ============================= #
 # Build SM100+ library with precise math (same namespace, different directory)
@@ -399,16 +404,17 @@ add_subdirectory(
     ${repo-mscclpp_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/mscclpp-build
 )
-
-target_link_libraries(common_ops_sm90_build PRIVATE ${TORCH_LIBRARIES} c10 cuda cublas cublasLt mscclpp_static)
+# rickojn no sm90
+# target_link_libraries(common_ops_sm90_build PRIVATE ${TORCH_LIBRARIES} c10 cuda cublas cublasLt mscclpp_static)
 target_link_libraries(common_ops_sm100_build PRIVATE ${TORCH_LIBRARIES} c10 cuda cublas cublasLt mscclpp_static)
 
 # sparse flash attention
-target_compile_definitions(common_ops_sm90_build PRIVATE
-    FLASHATTENTION_DISABLE_BACKWARD
-    FLASHATTENTION_DISABLE_DROPOUT
-    FLASHATTENTION_DISABLE_UNEVEN_K
-)
+# rickojn no sm90
+# target_compile_definitions(common_ops_sm90_build PRIVATE
+#     FLASHATTENTION_DISABLE_BACKWARD
+#     FLASHATTENTION_DISABLE_DROPOUT
+#     FLASHATTENTION_DISABLE_UNEVEN_K
+# )
 target_compile_definitions(common_ops_sm100_build PRIVATE
     FLASHATTENTION_DISABLE_BACKWARD
     FLASHATTENTION_DISABLE_DROPOUT
@@ -418,99 +424,100 @@ target_compile_definitions(common_ops_sm100_build PRIVATE
 # Install to different subdirectories
 # CMake will find the built libraries in their respective LIBRARY_OUTPUT_DIRECTORY locations
 # and install them to the specified destinations
-install(TARGETS common_ops_sm90_build LIBRARY DESTINATION sgl_kernel/sm90)
+# install(TARGETS common_ops_sm90_build LIBRARY DESTINATION sgl_kernel/sm90)
 install(TARGETS common_ops_sm100_build LIBRARY DESTINATION sgl_kernel/sm100)
 
+# rickojn no sm90
 # ============================ Optional Install: FA3 ============================= #
 # set flash-attention sources file
 # Now FA3 support sm80/sm86/sm90
-if (SGL_KERNEL_ENABLE_FA3)
-    set(SGL_FLASH_KERNEL_CUDA_FLAGS
-        "-DNDEBUG"
-        "-DOPERATOR_NAMESPACE=sgl-kernel"
-        "-O3"
-        "-Xcompiler"
-        "-fPIC"
-        "-gencode=arch=compute_90a,code=sm_90a"
-        "-std=c++17"
-        "-DCUTE_USE_PACKED_TUPLE=1"
-        "-DCUTLASS_ENABLE_TENSOR_CORE_MMA=1"
-        "-DCUTLASS_VERSIONS_GENERATED"
-        "-DCUTLASS_TEST_LEVEL=0"
-        "-DCUTLASS_TEST_ENABLE_CACHED_RESULTS=1"
-        "-DCUTLASS_DEBUG_TRACE_LEVEL=0"
-        "-DCUTLASS_ENABLE_GDC_FOR_SM90"  # For PDL
-        "-DCUTE_SM90_EXTENDED_MMA_SHAPES_ENABLED"  # Necessary for the WGMMA shapes that we use
-        "--expt-relaxed-constexpr"
-        "--expt-extended-lambda"
-        "--use_fast_math"
-        "-Xcompiler=-Wconversion"
-        "-Xcompiler=-fno-strict-aliasing"
-    )
+# if (SGL_KERNEL_ENABLE_FA3)
+#     set(SGL_FLASH_KERNEL_CUDA_FLAGS
+#         "-DNDEBUG"
+#         "-DOPERATOR_NAMESPACE=sgl-kernel"
+#         "-O3"
+#         "-Xcompiler"
+#         "-fPIC"
+#         "-gencode=arch=compute_90a,code=sm_90a"
+#         "-std=c++17"
+#         "-DCUTE_USE_PACKED_TUPLE=1"
+#         "-DCUTLASS_ENABLE_TENSOR_CORE_MMA=1"
+#         "-DCUTLASS_VERSIONS_GENERATED"
+#         "-DCUTLASS_TEST_LEVEL=0"
+#         "-DCUTLASS_TEST_ENABLE_CACHED_RESULTS=1"
+#         "-DCUTLASS_DEBUG_TRACE_LEVEL=0"
+#         "-DCUTLASS_ENABLE_GDC_FOR_SM90"  # For PDL
+#         "-DCUTE_SM90_EXTENDED_MMA_SHAPES_ENABLED"  # Necessary for the WGMMA shapes that we use
+#         "--expt-relaxed-constexpr"
+#         "--expt-extended-lambda"
+#         "--use_fast_math"
+#         "-Xcompiler=-Wconversion"
+#         "-Xcompiler=-fno-strict-aliasing"
+#     )
 
-    if (ENABLE_BELOW_SM90)
-        list(APPEND SGL_FLASH_KERNEL_CUDA_FLAGS
-            "-gencode=arch=compute_80,code=sm_80"
-            "-gencode=arch=compute_86,code=sm_86"
-        )
-        # SM8X Logic
-        file(GLOB FA3_SM8X_GEN_SRCS
-            "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim*_sm80.cu")
-    endif()
+#     if (ENABLE_BELOW_SM90)
+#         list(APPEND SGL_FLASH_KERNEL_CUDA_FLAGS
+#             "-gencode=arch=compute_80,code=sm_80"
+#             "-gencode=arch=compute_86,code=sm_86"
+#         )
+#         # SM8X Logic
+#         file(GLOB FA3_SM8X_GEN_SRCS
+#             "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim*_sm80.cu")
+#     endif()
 
-    file(GLOB FA3_BF16_GEN_SRCS
-        "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim[0-9]*_bf16*_sm90.cu")
-    file(GLOB FA3_BF16_GEN_SRCS_
-        "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdimdiff_bf16*_sm90.cu")
-    list(APPEND FA3_BF16_GEN_SRCS ${FA3_BF16_GEN_SRCS_})
+#     file(GLOB FA3_BF16_GEN_SRCS
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim[0-9]*_bf16*_sm90.cu")
+#     file(GLOB FA3_BF16_GEN_SRCS_
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdimdiff_bf16*_sm90.cu")
+#     list(APPEND FA3_BF16_GEN_SRCS ${FA3_BF16_GEN_SRCS_})
 
-    # FP16 source files - use individual hdim files instead of hdimall to avoid ptxas crash
-    file(GLOB FA3_FP16_GEN_SRCS
-        "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim[0-9]*_fp16*_sm90.cu")
-    file(GLOB FA3_FP16_GEN_SRCS_
-        "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdimdiff_fp16*_sm90.cu")
-    list(APPEND FA3_FP16_GEN_SRCS ${FA3_FP16_GEN_SRCS_})
+#     # FP16 source files - use individual hdim files instead of hdimall to avoid ptxas crash
+#     file(GLOB FA3_FP16_GEN_SRCS
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim[0-9]*_fp16*_sm90.cu")
+#     file(GLOB FA3_FP16_GEN_SRCS_
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdimdiff_fp16*_sm90.cu")
+#     list(APPEND FA3_FP16_GEN_SRCS ${FA3_FP16_GEN_SRCS_})
 
-    # FP8 source files
-    file(GLOB FA3_FP8_GEN_SRCS
-        "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim[0-9]*_e4m3*_sm90.cu")
-    file(GLOB FA3_FP8_GEN_SRCS_
-        "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdimdiff_e4m3*_sm90.cu")
-    list(APPEND FA3_FP8_GEN_SRCS ${FA3_FP8_GEN_SRCS_})
+#     # FP8 source files
+#     file(GLOB FA3_FP8_GEN_SRCS
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdim[0-9]*_e4m3*_sm90.cu")
+#     file(GLOB FA3_FP8_GEN_SRCS_
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/instantiations/flash_fwd_hdimdiff_e4m3*_sm90.cu")
+#     list(APPEND FA3_FP8_GEN_SRCS ${FA3_FP8_GEN_SRCS_})
 
-    set(FA3_GEN_SRCS ${FA3_BF16_GEN_SRCS} ${FA3_FP16_GEN_SRCS} ${FA3_FP8_GEN_SRCS} ${FA3_SM8X_GEN_SRCS})
+#     set(FA3_GEN_SRCS ${FA3_BF16_GEN_SRCS} ${FA3_FP16_GEN_SRCS} ${FA3_FP8_GEN_SRCS} ${FA3_SM8X_GEN_SRCS})
 
-    set(FLASH_SOURCES
-        "csrc/flash_extension.cc"
-        "${repo-flash-attention_SOURCE_DIR}/hopper/flash_prepare_scheduler.cu"
-        "${repo-flash-attention_SOURCE_DIR}/hopper/flash_api.cpp"
-        "${repo-flash-attention_SOURCE_DIR}/hopper/flash_fwd_combine.cu"
-        "${FA3_GEN_SRCS}"
-    )
+#     set(FLASH_SOURCES
+#         "csrc/flash_extension.cc"
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/flash_prepare_scheduler.cu"
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/flash_api.cpp"
+#         "${repo-flash-attention_SOURCE_DIR}/hopper/flash_fwd_combine.cu"
+#         "${FA3_GEN_SRCS}"
+#     )
 
-    Python_add_library(flash_ops MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${FLASH_SOURCES})
+#     Python_add_library(flash_ops MODULE USE_SABI ${SKBUILD_SABI_VERSION} WITH_SOABI ${FLASH_SOURCES})
 
-    target_compile_options(flash_ops PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${SGL_FLASH_KERNEL_CUDA_FLAGS}>)
-    target_include_directories(flash_ops PRIVATE
-        ${repo-cutlass_SOURCE_DIR}/include
-        ${repo-cutlass_SOURCE_DIR}/tools/util/include
-        ${repo-flash-attention_SOURCE_DIR}/hopper
-    )
-    target_link_libraries(flash_ops PRIVATE ${TORCH_LIBRARIES} c10 cuda)
+#     target_compile_options(flash_ops PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${SGL_FLASH_KERNEL_CUDA_FLAGS}>)
+#     target_include_directories(flash_ops PRIVATE
+#         ${repo-cutlass_SOURCE_DIR}/include
+#         ${repo-cutlass_SOURCE_DIR}/tools/util/include
+#         ${repo-flash-attention_SOURCE_DIR}/hopper
+#     )
+#     target_link_libraries(flash_ops PRIVATE ${TORCH_LIBRARIES} c10 cuda)
 
-    install(TARGETS flash_ops LIBRARY DESTINATION "sgl_kernel")
-    set(FLASH_OPS_COMPILE_DEFS
-        FLASHATTENTION_DISABLE_BACKWARD
-        FLASHATTENTION_DISABLE_DROPOUT
-        FLASHATTENTION_DISABLE_UNEVEN_K
-        FLASHATTENTION_VARLEN_ONLY
-    )
+#     install(TARGETS flash_ops LIBRARY DESTINATION "sgl_kernel")
+#     set(FLASH_OPS_COMPILE_DEFS
+#         FLASHATTENTION_DISABLE_BACKWARD
+#         FLASHATTENTION_DISABLE_DROPOUT
+#         FLASHATTENTION_DISABLE_UNEVEN_K
+#         FLASHATTENTION_VARLEN_ONLY
+#     )
 
-    if(NOT ENABLE_BELOW_SM90)
-        list(APPEND FLASH_OPS_COMPILE_DEFS FLASHATTENTION_DISABLE_SM8x)
-    endif()
-    target_compile_definitions(flash_ops PRIVATE ${FLASH_OPS_COMPILE_DEFS})
-endif()
+#     if(NOT ENABLE_BELOW_SM90)
+#         list(APPEND FLASH_OPS_COMPILE_DEFS FLASHATTENTION_DISABLE_SM8x)
+#     endif()
+#     target_compile_definitions(flash_ops PRIVATE ${FLASH_OPS_COMPILE_DEFS})
+# endif()
 
 # Build spatial_ops as a separate, optional extension for green contexts
 set(SPATIAL_SOURCES
